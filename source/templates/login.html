@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/css/terminal.min.css"/>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <title>wg-yopta</title>
+</head>
+<body class="terminal">
+
+<div class="container centred-login">
+    <form id="login-form" action="login.html">
+        <header class="terminal-logo">
+            <div class="logo terminal-prompt"><a class="no-style logo-login">WG Yopta</a></div>
+        </header>
+        <fieldset style="padding-bottom: 0">
+            <div class="alert terminal-alert terminal-alert-error" style="margin-bottom: 1em; display: none">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            </div>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input id="username" name="username" type="text" required="" placeholder="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="password">
+            </div>
+            <div class="form-group" style="display: flex; justify-content: center;">
+                <button class="btn btn-default" type="submit" name="submit" id="submit">Sign In</button>
+            </div>
+        </fieldset>
+    </form>
+</div>
+</body>
+</html>
+
+<script>
+    $(document).ready(
+        $("#login-form").submit(function (event) {
+            event.preventDefault()
+            console.log('SUBMIT')
+            $.post(
+                "{{ url_for('login') }}",
+                {
+                    username: $("#username").val(),
+                    password: $("#password").val()
+                })
+                .done(function (response) {
+                    if (response.message){
+                        $(".alert")
+                            .html(response.message)
+                            .append('<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>')
+                            .css('opacity', '1')
+                            .slideToggle()
+                            .delay(1000)
+                            .fadeTo(500,0)
+                            .slideUp(500)
+                    }
+                    else if (response.url){
+                        window.location.href = response.url
+                    }
+                })
+        })
+    )
+
+</script>

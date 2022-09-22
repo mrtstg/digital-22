@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="components components-grid">
+            <aside id="menu">
+                <h2>Components</h2>
+                <nav>
+                    <ul>
+                        <li><a href="/">Schedule</a></li>
+                        <li><a href="{{ url_for('teachers') }}">Teachers</a></li>
+                        <li><a href={{ url_for('courses') }}>Courses</a></li>
+                        <li><a href="{{ url_for('users') }}">Users</a></li>
+                    </ul>
+                </nav>
+            </aside>
+            <main>
+                <section>
+                    <div id="delete-user-alert"
+                         class="alert terminal-alert terminal-alert-error"
+                         style="margin-bottom: 1em; display: none">
+                    </div>
+                    <table>
+                        <caption>
+                            Users
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Hash</th>
+                            <th>Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td style="text-align: center; color: var(--font-color);font-weight: inherit;">{{ user.username }}</td>
+                                <td style="text-align: center">{{ user.password }}</td>
+                                <td style="text-align: center"><a onclick="delete_user({{ user.id|string }})"
+                                >&times;</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+                <hr>
+                <section>
+                    <h2>Add user</h2>
+                    <form id="add-user">
+                        <fieldset style="padding-bottom: 0">
+                            <div id="add-user-alert"
+                                 class="alert terminal-alert terminal-alert-error"
+                                 style="margin-bottom: 1em; display: none">
+                            </div>
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input id="username" name="username" type="text" required="" placeholder="Username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="password" required="" placeholder="password">
+                            </div>
+                            <div class="form-group">
+                                <label for="submit">Add user:</label>
+                                <button class="btn btn-default" type="submit" id="submit">Submit</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </section>
+                <hr>
+                <section>
+                    <h2>Change password</h2>
+                    <form id="change-password">
+                        <fieldset style="padding-bottom: 0">
+                            <div class="form-group">
+                                <label for="p-username">Username:</label>
+                                <select id="p-username" name="username">
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="p-password">Password:</label>
+                                <input type="password" id="p-password" name="password" required="" placeholder="password">
+                            </div>
+                            <div class="form-group">
+                                <label for="p-submit">Change password:</label>
+                                <button class="btn btn-default" type="submit" id="p-submit">Submit</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script>
+        function delete_user(id) {
+            $.post(
+                "{{ url_for('delete_user') }}",
+                {
+                    id: id
+                })
+                .done(function (response) {
+                    if (response.message) {
+                        $("#delete-user-alert")
+                            .html(response.message)
+                            .css('opacity', '1')
+                            .slideToggle()
+                            .delay(1000)
+                            .fadeTo(500, 0)
+                            .slideUp(500)
+                    } else if (response.url) {
+                        window.location.href = response.url
+                    }
+                })
+        }
+
+        $(document).ready(
+            $("#add-user").submit(function (event) {
+                event.preventDefault()
+                console.log('SUBMIT')
+                $.post(
+                    "{{ url_for('add_user') }}",
+                    {
+                        username: $("#username").val(),
+                        password: $("#password").val()
+                    })
+                    .done(function (response) {
+                        if (response.message) {
+                            $("#add-user-alert")
+                                .html(response.message)
+                                .css('opacity', '1')
+                                .slideToggle()
+                                .delay(1000)
+                                .fadeTo(500, 0)
+                                .slideUp(500)
+                        } else if (response.url) {
+                            window.location.href = response.url
+                        }
+                    })
+            })
+        )
+
+        $(document).ready(
+            $("#change-password").submit(function (event) {
+                event.preventDefault()
+                console.log('SUBMIT')
+                $.post(
+                    "{{ url_for('change_password') }}",
+                    {
+                        username: $("#p-username").val(),
+                        password: $("#p-password").val()
+                    })
+                    .done(function (response) {
+                        if (response.url) {
+                            window.location.href = response.url
+                        }
+                    })
+            })
+        )
+    </script>
+{% endblock %}

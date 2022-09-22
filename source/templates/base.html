@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/css/terminal.min.css"/>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <title>DigitalSkills</title>
+</head>
+<body class="terminal">
+<div class="container">
+    <div class="terminal-nav">
+        <header class="terminal-logo">
+            <div class="logo terminal-prompt"><a href="/" class="no-style">DigitalSkills</a></div>
+        </header>
+        <nav class="terminal-menu" style="">
+            <ul>
+                {% if request.user.is_authenticated %}
+                    <li><a href="{{ url_for('logout') }}" class="menu-item"><span>Logout</span></a></li>
+                {% endif %}
+                <li style="height: 28px;"><span></span></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+{% block content %}{% endblock %}
+</body>
+</html>

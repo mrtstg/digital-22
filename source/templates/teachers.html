@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="components components-grid">
+            <aside id="menu">
+                <h2>Components</h2>
+                <nav>
+                    <ul>
+                        <li><a href="/">Schedule</a></li>
+                        <li><a href="{{ url_for('teachers') }}">Teachers</a></li>
+                        <li><a href={{ url_for('courses') }}>Courses</a></li>
+                        <li><a href="{{ url_for('users') }}">Users</a></li>
+                    </ul>
+                </nav>
+            </aside>
+            <main>
+                <section>
+                    <div class="alert terminal-alert terminal-alert-error"
+                         style="margin-bottom: 1em; display: none">
+                    </div>
+                    <table>
+                        <caption>
+                            Teachers
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for teacher in teachers %}
+                            <tr>
+                                <td style="text-align: center; color: var(--font-color);font-weight: inherit;">{{ teacher.name }}</td>
+                                <td style="text-align: center">{{ teacher.phone }}</td>
+                                <td style="text-align: center">{{ teacher.email }}</td>
+                                <td style="text-align: center"><a onclick="delete_teacher({{ teacher.id|string }})"
+                                >&times;</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+                <hr>
+                <section>
+                    <h2>Add teacher</h2>
+                    <form id="add-teacher" action="{{ url_for('add_teacher') }}" method="post">
+                        <fieldset style="padding-bottom: 0">
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input id="name" name="name" type="text" required="" placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone:</label>
+                                <input type="text" id="phone" name="phone" required="" placeholder="+1-234-567-89-00">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email:</label>
+                                <input type="text" id="email" name="email" required=""
+                                       placeholder="example@digital.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="submit">Add teacher:</label>
+                                <button class="btn btn-default" type="submit" id="submit">Submit</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script>
+        function delete_teacher(id) {
+            $.post(
+                "{{ url_for('delete_teacher') }}",
+                {
+                    id: id
+                })
+                .done(function (response) {
+                    if (response.message) {
+                        $(".alert")
+                            .html(response.message)
+                            .css('opacity', '1')
+                            .slideToggle()
+                            .delay(1000)
+                            .fadeTo(500, 0)
+                            .slideUp(500)
+                    } else if (response.url) {
+                        window.location.href = response.url
+                    }
+                })
+        }
+    </script>
+{% endblock %}

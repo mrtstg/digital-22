@@ -1,0 +1,46 @@
+.closebtn {
+    padding-top: 0.5%;
+    color: var(--error-color);
+    font-weight: bold;
+    float: right;
+    font-size: var(--global-font-size);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.closebtn:hover {
+    color: black;
+}
+
+.centred-login {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-login {
+    cursor: default;
+}
+
+.components-grid {
+    display: grid;
+    grid-column-gap: 1.4em;
+    grid-template-columns: 3fr 9fr;
+    grid-template-rows: auto;
+}
+
+.fixedContainer {
+    background-color:#ddd;
+    position: fixed;
+    padding: 2em;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

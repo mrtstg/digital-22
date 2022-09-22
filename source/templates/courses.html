@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="components components-grid">
+            <aside id="menu">
+                <h2>Components</h2>
+                <nav>
+                    <ul>
+                        <li><a href="/">Schedule</a></li>
+                        <li><a href="{{ url_for('teachers') }}">Teachers</a></li>
+                        <li><a href={{ url_for('courses') }}>Courses</a></li>
+                        <li><a href="{{ url_for('users') }}">Users</a></li>
+                    </ul>
+                </nav>
+            </aside>
+            <main>
+                <section>
+                    <div class="alert terminal-alert terminal-alert-error"
+                         style="margin-bottom: 1em; display: none">
+                    </div>
+                    <table>
+                        <caption>
+                            Courses
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Delete</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for course in courses %}
+                            <tr>
+                                <td style="text-align: center; color: var(--font-color);font-weight: inherit;">{{ course.name }}</td>
+                                <td style="text-align: center">{{ course.description }}</td>
+                                <td style="text-align: center"><a onclick="delete_course({{ course.id|string }})"
+                                >&times;</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+                <hr>
+                <section>
+                    <h2>Add course</h2>
+                    <form id="add-course" action="{{ url_for('add_course') }}" method="post">
+                        <fieldset style="padding-bottom: 0">
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input id="name" name="name" type="text" required="" placeholder="Name">
+                            </div>
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <textarea id="description" name="description" required=""
+                                          placeholder="Write some info..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="submit">Add course:</label>
+                                <button class="btn btn-default" type="submit" id="submit">Submit</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script>
+        function delete_course(id) {
+            $.post(
+                "{{ url_for('delete_course') }}",
+                {
+                    id: id
+                })
+                .done(function (response) {
+                    if (response.message) {
+                        $(".alert")
+                            .html(response.message)
+                            .css('opacity', '1')
+                            .slideToggle()
+                            .delay(1000)
+                            .fadeTo(500, 0)
+                            .slideUp(500)
+                    } else if (response.url) {
+                        window.location.href = response.url
+                    }
+                })
+        }
+    </script>
+{% endblock %}

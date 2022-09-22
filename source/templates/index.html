@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="components components-grid">
+            <aside id="menu">
+                {% if not request.user.is_authenticated %}
+                    <form id="login-form" style="margin-bottom: var(--global-line-height);">
+                        <fieldset style="padding-bottom: 0">
+                            <div class="alert terminal-alert terminal-alert-error"
+                                 style="margin-bottom: 1em; display: none">
+                            </div>
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input id="username" name="username" type="text" required="" placeholder="username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" id="password" name="password" required="" placeholder="password">
+                            </div>
+                            <div class="form-group" style="display: flex; justify-content: center;">
+                                <button class="btn btn-default" type="submit" name="submit" id="submit">Sign In</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                {% else %}
+                    <h2>Components</h2>
+                    <nav>
+                        <ul>
+                            <li><a href="/">Schedule</a></li>
+                            <li><a href="{{ url_for('teachers') }}">Teachers</a></li>
+                            <li><a href={{ url_for('courses') }}>Courses</a></li>
+                            <li><a href="{{ url_for('users') }}">Users</a></li>
+                        </ul>
+                    </nav>
+                {% endif %}
+
+
+            </aside>
+
+            <main>
+                <section>
+                    <header>
+                        <h2>DigitalSkills Schedule App</h2>
+                        <p>
+                            You can see your schedule for today below!
+                        </p>
+                    </header>
+                </section>
+                <hr>
+                <section>
+                    <table>
+                        <caption>
+                            Schedule for {{ today.strftime('%d %B %Y') }}
+                        </caption>
+                        <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Teacher</th>
+                            <th>Duration</th>
+                            {% if request.user.is_authenticated %}
+                                <th>Delete</th>
+                            {% endif %}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for lesson in lessons %}
+                            <tr>
+                                <td style="text-align: center; color: var(--font-color);font-weight: inherit;">{{ lesson.course.name }}</td>
+                                <td style="text-align: center">{{ lesson.teacher.name }}</td>
+                                <td style="text-align: center">{{ lesson.start.strftime('%H:%M') }}
+                                    - {{ (lesson.start + one_and_half_hours).strftime('%H:%M') }}</td>
+                                {% if request.user.is_authenticated %}
+                                    <td style="text-align: center"><a
+                                            href="{{ url_for('delete_lesson')+'?id='+lesson.id|string }}">&times;</a>
+                                    </td>
+                                {% endif %}
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+                <hr>
+                <section>
+                    <h2>Or choose another one!</h2>
+                    <form id="day-form" action="/">
+                        <fieldset style="padding-bottom: 0">
+
+                            <div class="form-group">
+                                <label for="date">Date:</label>
+                                <input id="date" name="date" type="date" value="{{ today.strftime('%Y-%m-%d') }}"
+                                       required=""
+                                       style="color: var(--background-color);background-color: var(--font-color);">
+                            </div>
+                            <div class="form-group">
+                                <label for="submit">Look schedule:</label>
+                                <button class="btn btn-default" type="submit" id="submit">Submit</button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </section>
+                <hr>
+                {% if request.user.is_authenticated %}
+                    <section>
+                        <h2>Add lesson</h2>
+                        <form id="add-lesson">
+                            <fieldset style="padding-bottom: 0">
+                                <div class="alert terminal-alert terminal-alert-error"
+                                     style="margin-bottom: 1em; display: none">
+                                </div>
+                                <div class="form-group">
+                                    <label for="course">Course:</label>
+                                    <select id="course" name="course">
+                                        {% for course in courses %}
+                                            <option value="{{ course.id }}">{{ course.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="teacher">Teacher:</label>
+                                    <select id="teacher" name="teacher">
+                                        {% for teacher in teachers %}
+                                            <option value="{{ teacher.id }}">{{ teacher.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="date_lesson">Date:</label>
+                                    <input id="date_lesson" name="date" type="datetime-local"
+                                           value="{{ today.strftime('%Y-%m-%dT%H:%M') }}"
+                                           required=""
+                                           style="color: var(--background-color);background-color: var(--font-color);">
+                                </div>
+                                <div class="form-group">
+                                    <label for="submit">Add lesson:</label>
+                                    <button class="btn btn-default" type="submit" id="submit">Submit</button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </section>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+    <script>
+        $(document).ready(
+            $("#login-form").submit(function (event) {
+                event.preventDefault()
+                console.log('SUBMIT')
+                $.post(
+                    "{{ url_for('login') }}",
+                    {
+                        username: $("#username").val(),
+                        password: $("#password").val()
+                    })
+                    .done(function (response) {
+                        if (response.message) {
+                            $(".alert")
+                                .html(response.message)
+                                .css('opacity', '1')
+                                .slideToggle()
+                                .delay(1000)
+                                .fadeTo(500, 0)
+                                .slideUp(500)
+                        } else if (response.url) {
+                            window.location.href = response.url
+                        }
+                    })
+            })
+        )
+
+        $(document).ready(
+            $("#add-lesson").submit(function (event) {
+                event.preventDefault()
+                console.log('SUBMIT')
+                $.post(
+                    "{{ url_for('add_lesson') }}",
+                    {
+                        course: $("#course").val(),
+                        teacher: $("#teacher").val(),
+                        date: $("#date_lesson").val()
+                    })
+                    .done(function (response) {
+                        if (response.message) {
+                            $(".alert")
+                                .html(response.message)
+                                .css('opacity', '1')
+                                .slideToggle()
+                                .delay(1000)
+                                .fadeTo(500, 0)
+                                .slideUp(500)
+                        } else if (response.url) {
+                            window.location.href = response.url
+                        }
+                    })
+            })
+        )
+
+    </script>
+{% endblock %}
