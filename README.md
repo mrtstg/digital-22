@@ -89,3 +89,13 @@ For example, change line 17 in `tests/test_login.py`
 
 If you want to commit some safe code you can change title in `base.html` for example or just add a new line anywhere to create some changes.
 
+### Build & basic deploy
+
+```
+cd digital-22
+docker build -t app .
+```
+
+```
+docker run -p 80:8000 -d app --name app
+```
